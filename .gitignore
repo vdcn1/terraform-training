@@ -1,0 +1,3 @@
+# Ignore packer openssh/rsa keys
+tf-packer
+tf-packer.pub

@@ -12,14 +12,13 @@ app = Flask(__name__)
 def retrieve_tags():
     ec2 = boto3.client('ec2', region_name="us-east-2")
     print(ec2_metadata.instance_id)
-    response = ec2.describe_instances(InstanceIds=[ec2_metadata.instance_id])
-    for reservation in response["Reservations"]:
+    description = ec2.describe_instances(InstanceIds=[ec2_metadata.instance_id])
+    response = []
+    for reservation in description["Reservations"]:
         for instance in reservation["Instances"]:
             for tags in instance["Tags"]:
-                tag_list = []
-                tag_list.append(tags)
-    response = dict(zip(tag_list))
-    return res
+                response.append(tags)
+    return str(response)
 
 @app.route("/shutdown")
 def shutdown_instance():

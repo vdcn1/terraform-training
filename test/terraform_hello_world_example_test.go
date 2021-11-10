@@ -43,7 +43,8 @@ func TestTerraformHelloWorldExample(t *testing.T) {
 	fmt.Println(instanceURLTags)
 
 	// Specify the text the EC2 Instance will return when we make HTTP requests to it.
-	instanceText := fmt.Sprintf("[{\"Key\": \"Name\", \"Value\": \"%s\"}, {\"Key\": \"Owner\", \"Value\": \"%s\"}]", tags["Owner"], tags["Name"])
+	instanceText := fmt.Sprintf("[{'Key': 'Owner', 'Value': '%s'}, {'Key': 'Name', 'Value': '%s'}]", tags["Owner"], tags["Name"])
+	instanceTextAlt := fmt.Sprintf("[{'Key': 'Name', 'Value': '%s'}, {'Key': 'Owner', 'Value': '%s'}]", tags["Name"], tags["Owner"])
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times: (waiting a few seconds)
 	time.Sleep(100 * time.Second)
@@ -56,7 +57,15 @@ func TestTerraformHelloWorldExample(t *testing.T) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
-	assert.Equal(t, instanceText, string(body))
+	//assert.Equal(t, instanceText, string(body))
+
+	assert.Condition(t, func() bool {
+		if (instanceText == string(body)) || (instanceTextAlt == string(body)) {
+			return true
+		} else {
+			return false
+		}
+	})
 
 	resp, err = http.Get(instanceURLShutdown)
 
@@ -66,7 +75,7 @@ func TestTerraformHelloWorldExample(t *testing.T) {
 
 	body, _ = ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
-	assert.Equal(t, "Shuting down...", string(body))
+	assert.Equal(t, "Shuting down...\n", string(body))
 
 	assert.Equal(t, name_compare, tags["Name"])
 	assert.Equal(t, owner_compare, tags["Owner"])

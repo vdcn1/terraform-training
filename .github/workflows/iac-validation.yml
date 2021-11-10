@@ -1,0 +1,85 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    environment: flugel-trial
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Configure aws Credentials
+      - name: Configure AWS Credentials Action For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+      
+      # Install packer
+      - name: Installing packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+      
+      # Install terraform
+      - name: Installing Terraform
+        run: |
+          sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install terraform
+
+      # Generate dummy key for packer validation
+      - name: Generating packer keys
+        run: ssh-keygen -t rsa -C "johndoe@example.com" -f ./tf-packer
+
+      # Validate packer
+      - name: Validate packer
+        run: |
+          cd images
+          touch .env
+          echo "[default]" >> .env
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "aws_access_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          packer validate .
+
+      # Validate packer
+      - name: Validate terraform
+        run: |
+          cd instances
+          terraform init
+          terraform validate
+
+      # Perform terratest
+      - name: Terratest tag testing
+        run: |
+          cd test
+          go get "github.com/gruntwork-io/terratest/modules/aws"
+          go get "github.com/gruntwork-io/terratest/modules/terraform"
+          go get "github.com/stretchr/testify/assert"
+          go test -v
+          

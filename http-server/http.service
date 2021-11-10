@@ -1,0 +1,13 @@
+[Unit]
+Description=My test service
+After=multi-user.target
+
+[Service]
+User=terraform
+Type=simple
+Restart=always
+Environment=FLASK_APP=/home/terraform/terraform-training/http-server/app.py
+ExecStart=/usr/bin/flask run --host 0.0.0.0 --port 5000
+
+[Install]
+WantedBy=multi-user.target

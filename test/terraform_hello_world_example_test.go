@@ -43,7 +43,7 @@ func TestTerraformHelloWorldExample(t *testing.T) {
 	fmt.Println(instanceURLTags)
 
 	// Specify the text the EC2 Instance will return when we make HTTP requests to it.
-	instanceText := fmt.Sprintf("[{\"Key\": \"Owner\", \"Value\": \"%s\"}, {\"Key\": \"Name\", \"Value\": \"%s\"}]", tags["Owner"], tags["Name"])
+	instanceText := fmt.Sprintf("[{\"Key\": \"Name\", \"Value\": \"%s\"}, {\"Key\": \"Owner\", \"Value\": \"%s\"}]", tags["Owner"], tags["Name"])
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times: (waiting a few seconds)
 	time.Sleep(100 * time.Second)

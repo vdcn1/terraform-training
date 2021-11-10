@@ -114,7 +114,7 @@ resource "aws_security_group" "instance" {
 # }
 
 resource "aws_instance" "web" {
-  ami                         = "ami-09ba502e019053ec7"
+  ami                         = "ami-07ac00c72612e90ae"
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.instance.id]
 

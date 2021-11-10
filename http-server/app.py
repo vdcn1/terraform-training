@@ -16,8 +16,9 @@ def retrieve_tags():
     for reservation in response["Reservations"]:
         for instance in reservation["Instances"]:
             for tags in instance["Tags"]:
-                res = []
-                res.append(tags)
+                tag_list = []
+                tag_list.append(tags)
+    response = dict(zip(tag_list))
     return res
 
 @app.route("/shutdown")

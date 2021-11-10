@@ -114,7 +114,7 @@ resource "aws_security_group" "instance" {
 # }
 
 resource "aws_instance" "web" {
-  ami                         = "ami-0c20398405a15b508"
+  ami                         = "ami-09ba502e019053ec7"
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.instance.id]
 
@@ -125,7 +125,7 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_s3_bucket" "flugel_bucket_test" {
-  bucket = "flugel-bucket"
+  bucket = "flugel-bucket-124981n9f87"
   tags = {
     Name  = var.name_tag
     Owner = var.owner_tag
